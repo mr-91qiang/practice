@@ -24,14 +24,14 @@ import (
 	"flag"
 	"fmt"
 	"go.uber.org/zap"
-	"google.golang.org/grpc/balancer/roundrobin"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/grpc/resolver"
 	"log"
-	"test/configs/etcd"
-	"time"
+	"proctice/configs/etcd"
+	pb "proctice/proto/pb"
 
-	"google.golang.org/grpc"
-	pb "test/proto/pb"
+	"time"
 )
 
 const (
@@ -42,6 +42,9 @@ var (
 	addr = flag.String("addr", "localhost:50051", "the address to connect to")
 	name = flag.String("name", defaultName, "Name to greet")
 )
+var serviceConfig = `{
+    "loadBalancingPolicy": "round_robin"
+}`
 
 func main() {
 	flag.Parse()
@@ -50,7 +53,8 @@ func main() {
 	r := etcd.NewResolver(etcdAddrs, zap.NewNop())
 	resolver.Register(r)
 
-	conn, err := grpc.Dial("etcd:///server", grpc.WithInsecure(), grpc.WithBalancerName(roundrobin.Name))
+	conn, err := grpc.Dial("etcd:///server",
+		grpc.WithTransportCredentials(insecure.NewCredentials()), grpc.WithDefaultServiceConfig(serviceConfig))
 	if err != nil {
 		log.Fatalf("failed to dial %v", err)
 	}

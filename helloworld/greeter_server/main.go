@@ -29,9 +29,9 @@ import (
 	"net"
 	"os"
 	"os/signal"
+	"proctice/configs/etcd"
+	pb "proctice/proto/pb"
 	"syscall"
-	"test/configs/etcd"
-	pb "test/proto/pb"
 	"time"
 )
 
